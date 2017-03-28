@@ -48,12 +48,18 @@ void UGrabber::SetupInputComponent()
 
 void UGrabber::Grab() 
 {
-	/// LINE TRACE and see if we reach any actors with physics body collision channel set
+	 /// LINE TRACE and see if we reach any actors with physics body collision channel set
 	 auto HitResult = GetFirstPhysicsBodyInReach();
 	 auto ComponentToGrab = HitResult.GetComponent(); // gets the mesh in our case
 	 auto ActorHit = HitResult.GetActor();
 
-	/// If we hit something then attach a physics handle
+	 /// protecting pointer to nullptr
+	 if (!PhysicsHandle)
+	 {
+		 return;
+	 }
+
+	 /// If we hit something then attach a physics handle
 	 if (ActorHit)
 	 {
 		 PhysicsHandle->GrabComponent(
@@ -67,6 +73,12 @@ void UGrabber::Grab()
 
 void UGrabber::Release()
 {
+	/// protecting pointer to nullptr
+	if (!PhysicsHandle)
+	{
+		return;
+	}
+
 	PhysicsHandle->ReleaseComponent();
 }
 
@@ -75,6 +87,12 @@ void UGrabber::Release()
 void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+
+	/// protecting pointer to nullptr
+	if (!PhysicsHandle)
+	{
+		return;
+	}
 
 	// if the physics handle is attached
 	if (PhysicsHandle->GrabbedComponent)
